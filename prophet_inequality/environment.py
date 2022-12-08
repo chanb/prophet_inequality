@@ -79,4 +79,4 @@ class TruncatedGaussianReward(Environment):
         return self._sampled_reward[self._curr_step]
 
     def get_max_rewards(self) -> np.ndarray:
-        return np.sort(self._sampled_reward)[: -self._num_accepts]
+        return np.sort(self._sampled_reward)[-self._num_accepts :]
