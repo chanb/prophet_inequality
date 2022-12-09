@@ -21,6 +21,14 @@ class Environment(ABC):
         self._num_accepts_remaining = self._num_accepts
         self._curr_step = 0
 
+    def get_state(self):
+        state = (
+            self._sampled_reward[self._curr_step]
+            if self._curr_step < self._num_dists
+            else None
+        )
+        return state
+
     def step(self, action: str) -> Tuple[Any, float, bool, bool, Dict]:
         truncation = False
         termination = False
@@ -30,14 +38,10 @@ class Environment(ABC):
             reward = self._sampled_reward[self._curr_step]
 
         self._curr_step += 1
-        if self._num_accepts_remaining <= 0 or self._curr_step >= self._num_dists:
+        if self._num_accepts_remaining <= 0 or self._curr_step + 1 >= self._num_dists:
             termination = True
 
-        state = (
-            self._sampled_reward[self._curr_step]
-            if self._curr_step < self._num_dists
-            else None
-        )
+        state = self.get_state()
         return state, reward, truncation, termination, {}
 
     @abstractclassmethod
@@ -76,7 +80,8 @@ class TruncatedGaussianReward(Environment):
             scale=self._scales,
             random_state=seed,
         )
-        return self._sampled_reward[self._curr_step]
+        state = self.get_state()
+        return state
 
     def get_max_rewards(self) -> np.ndarray:
         return np.sort(self._sampled_reward)[-self._num_accepts :]
@@ -89,3 +94,43 @@ class TruncatedGaussianReward(Environment):
             scale=self._scales,
         )
         return np.sort(medians)[-self._num_accepts :]
+
+
+class RLTruncatedGaussianReward(TruncatedGaussianReward):
+    def __init__(
+        self,
+        locs: Iterable[float],
+        scales: Iterable[float],
+        bounds: Iterable[Tuple[float, float]],
+        num_accepts: int,
+        history: int = None,
+    ):
+        super().__init__(locs, scales, bounds, num_accepts)
+        self._obs_dim = 3  # curr_reward, time_limit, remaining_accepts
+
+        # include a window of past rewards
+        self._history = None
+        if history and history > 0:
+            self._obs_dim += history
+            self._history = [0] * history
+
+    def reset(self, seed: int = None):
+        if self._history is not None:
+            self._history = [0] * len(self._history)
+        state = super().reset()
+        return state
+
+    def get_state(self):
+        curr_reward = (
+            self._sampled_reward[self._curr_step]
+            if self._curr_step < self._num_dists
+            else None
+        )
+        time_limit = (self._num_dists - self._curr_step) / self._num_dists
+        num_accepts = self._num_accepts_remaining / self._num_accepts
+        if self._history is not None:
+            state = self._history + [curr_reward, time_limit, num_accepts]
+            self._history = self._history[1:] + [curr_reward]
+        else:
+            state = [curr_reward, time_limit, num_accepts]
+        return state

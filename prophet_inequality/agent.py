@@ -11,11 +11,17 @@ class Agent(ABC):
     def act(self, state: Any) -> Any:
         raise NotImplementedError
 
+    def update(self):
+        pass
+
+    def store(
+        self, state: Any, action: Any, reward: float, truncated: bool, terminated: bool
+    ):
+        pass
+
 
 class RandomAgent(Agent):
-    def __init__(
-        self, accept_probability: float, rng: np.random.RandomState
-    ):
+    def __init__(self, accept_probability: float, rng: np.random.RandomState):
         self._accept_probability = accept_probability
         self._rng = rng
 
@@ -47,3 +53,26 @@ class ProbabilisticThresholdAgent(Agent):
         if state >= self._threshold or self._rng.rand() < self._accept_probability:
             return ACCEPT
         return REJECT
+
+
+class REINFORCEAgent(Agent):
+    def __init__(
+        self, threshold: float, accept_probability: float, rng: np.random.RandomState
+    ):
+        self._threshold = threshold
+        self._accept_probability = accept_probability
+        self._rng = rng
+        self._curr_traj = []
+
+    def act(self, state: float) -> str:
+        if state >= self._threshold or self._rng.rand() < self._accept_probability:
+            return ACCEPT
+        return REJECT
+
+    def update(self):
+        pass
+
+    def store(
+        self, state: Any, action: Any, reward: float, truncated: bool, terminated: bool
+    ):
+        pass
