@@ -25,6 +25,7 @@ python experiment_multi_item.py
 python experiment_rl.py
 ```
 Note that for `experiment_multi_item.py`, we will need to change `num_accepts` to modify `k`.
+Note: Not sure what is going on with the memory leak in PyTorch with M1... Does it have to do with my implementation...? Not sure.
 
 ### Code Structure
 ```
