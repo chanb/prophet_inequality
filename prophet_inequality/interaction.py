@@ -14,25 +14,31 @@ def evaluate(
     num_trials: int,
     seed: int = None,
     skip_agent: bool = False,
+    reduction: str = "mean",
 ) -> Tuple[float, float]:
     rng = np.random.RandomState(seed=seed)
 
-    oracle_rewards = 0.0
+    agent_rewards = []
+    oracle_rewards = []
     for _ in tqdm(range(num_trials)):
-        env.reset(rng.randint(low=0, high=MAX_INT))
-        oracle_rewards += np.sum(env.get_max_rewards()) / num_trials
-
-    agent_rewards = 0.0
-    if not skip_agent:
-        for _ in tqdm(range(num_trials)):
-            state = env.reset(rng.randint(low=0, high=MAX_INT))
+        state = env.reset(rng.randint(low=0, high=MAX_INT))
+        if not skip_agent:
             done = False
             curr_trial_reward = 0
             while not done:
-                decision = agent.act(state)
-                state, reward, truncated, terminated, _ = env.step(decision)
+                action = agent.act(state)
+                next_state, reward, truncated, terminated, _ = env.step(action)
                 done = truncated or terminated
                 curr_trial_reward += reward
-            agent_rewards += curr_trial_reward / num_trials
+                agent.store(state, action, reward, truncated, terminated, next_state)
+                state = next_state
+                agent.update()
+            agent_rewards.append(curr_trial_reward)
+        oracle_rewards.append(np.sum(env.get_max_rewards()))
 
-    return oracle_rewards, agent_rewards
+    if reduction == "mean":
+        return np.mean(oracle_rewards), np.mean(agent_rewards)
+    elif reduction is None:
+        return np.asarray(oracle_rewards), np.asarray(agent_rewards)
+    else:
+        raise NotImplementedError

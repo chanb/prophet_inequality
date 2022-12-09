@@ -104,9 +104,21 @@ class RLTruncatedGaussianReward(TruncatedGaussianReward):
         bounds: Iterable[Tuple[float, float]],
         num_accepts: int,
         history: int = None,
+        subtract_max: bool = False,
+        normalize: bool = False,
     ):
         super().__init__(locs, scales, bounds, num_accepts)
         self._obs_dim = 3  # curr_reward, time_limit, remaining_accepts
+        self._baseline = 0
+
+        self._state_mean = 0.0
+        self._state_std = 1.0
+        if normalize:
+            self._state_mean = np.mean(locs)
+            self._state_std = np.std(locs)
+
+        if subtract_max:
+            self._baseline = np.max(locs)
 
         # include a window of past rewards
         self._history = None
@@ -126,6 +138,7 @@ class RLTruncatedGaussianReward(TruncatedGaussianReward):
             if self._curr_step < self._num_dists
             else None
         )
+        curr_reward = (curr_reward - self._state_mean) / self._state_std
         time_limit = (self._num_dists - self._curr_step) / self._num_dists
         num_accepts = self._num_accepts_remaining / self._num_accepts
         if self._history is not None:
@@ -134,3 +147,8 @@ class RLTruncatedGaussianReward(TruncatedGaussianReward):
         else:
             state = [curr_reward, time_limit, num_accepts]
         return state
+
+    def step(self, action: str) -> Tuple[Any, float, bool, bool, Dict]:
+        state, reward, truncation, termination, info = super().step(action)
+        reward -= self._baseline
+        return state, reward, truncation, termination, info
