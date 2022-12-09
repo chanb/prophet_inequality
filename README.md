@@ -24,8 +24,8 @@ python experiment_multi_item.py
 # For RL experiment, this will generate a return plot between OPT (i.e. true max of that particular episode), best loc (i.e. best fixed policy), and REINFORCE learner. The regret can be computed by taking the difference as well.
 python experiment_rl.py
 ```
-Note that for `experiment_multi_item.py`, we will need to change `num_accepts` to modify `k`.
-Note: Not sure what is going on with the memory leak in PyTorch with M1... Does it have to do with my implementation...? Not sure.
+Note that for `experiment_multi_item.py`, we will need to change `num_accepts` to modify `k`.  
+Note: Not sure what is going on with the memory leak in PyTorch with M1... Does it have to do with my REINFORCE implementation...? Not sure. Nevertheless, even with the exact same seeding and hyperparameters, the run may or may not complete on the M1 Mac. If I find a different machine then I will test again...
 
 ### Code Structure
 ```
