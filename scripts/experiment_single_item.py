@@ -1,4 +1,4 @@
-from prophet_inequality.agent import ThresholdAgent
+from prophet_inequality.agent import ThresholdAgent, RandomAgent
 from prophet_inequality.environment import TruncatedGaussianReward
 from prophet_inequality.interaction import evaluate
 from prophet_inequality.utils import generate_truncated_gaussians
@@ -35,14 +35,23 @@ print(
     )
 )
 
-threshold = env.get_top_medians()
-print("Obtained eta: {}".format(threshold[0]))
+threshold = env.get_top_medians()[-1]
+print("Obtained eta: {}".format(threshold))
 
 agent = ThresholdAgent(threshold=threshold)
-oracle_rewards, agent_rewards = evaluate(env, agent, num_trials, seed)
+_, agent_rewards = evaluate(env, agent, num_trials, seed)
 reward_ratio = agent_rewards / oracle_rewards
 print(
     "The empirical expected ratio between ALG and max_i X_i for eta is {}".format(
+        reward_ratio
+    )
+)
+
+agent = RandomAgent(accept_probability=0.4, rng=np.random.RandomState(seed))
+_, agent_rewards = evaluate(env, agent, num_trials, seed)
+reward_ratio = agent_rewards / oracle_rewards
+print(
+    "The empirical expected ratio between ALG and max_i X_i for random agent is {}".format(
         reward_ratio
     )
 )
