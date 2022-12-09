@@ -72,6 +72,7 @@ class REINFORCEAgent(Agent):
         batch_size: int,
         ent_coef: float = 0.0,
         decay_factor: float = 0.0,
+        normalize_return: bool = False,
     ):
         self._model = model
         self._opt = opt
@@ -81,6 +82,7 @@ class REINFORCEAgent(Agent):
         self._curr_count = 0
         self._ent_coef = ent_coef
         self._decay_factor = decay_factor
+        self._normalize_return = normalize_return
 
     def act(self, state: Any) -> str:
         with torch.no_grad():
@@ -115,12 +117,12 @@ class REINFORCEAgent(Agent):
             states = torch.tensor(states).float()
             actions = torch.tensor(actions).float()
             returns = torch.tensor(returns).float()
-            returns = (returns - torch.mean(returns)) / (torch.std(returns) + 1e-5)
+            if self._normalize_return:
+                returns = (returns - torch.mean(returns)) / (torch.std(returns) + 1e-5)
 
             logits = self._model(states)
             dists = torch.distributions.Bernoulli(logits=logits)
-            log_probs = dists.log_prob(actions)
-
+            log_probs = torch.sum(dists.log_prob(actions), dim=-1)
             reinforce_loss = -torch.mean(log_probs * returns)
             entropy_loss = -torch.mean(dists.entropy())  # Maximize entropy
             pbar.set_postfix(

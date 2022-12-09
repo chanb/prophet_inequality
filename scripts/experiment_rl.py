@@ -11,8 +11,7 @@ import numpy as np
 import torch
 
 seed = 42
-trials_for_lambda = 500000
-num_trials = 1000000
+num_trials = 10000000
 num_dists = 100
 
 # Settings for valid truncated normals
@@ -39,22 +38,22 @@ env = RLTruncatedGaussianReward(
 )
 
 # Linear model
-# model = torch.nn.Linear(6, 1)
+model = torch.nn.Linear(6, 1)
 
 # Non-linear model
-model = torch.nn.Sequential(
-    torch.nn.Linear(6, 32), torch.nn.ReLU(), torch.nn.Linear(32, 1)
-)
+# model = torch.nn.Sequential(
+#     torch.nn.Linear(6, 32), torch.nn.ReLU(), torch.nn.Linear(32, 1)
+# )
 
 # Basic SGD
-opt = torch.optim.SGD(model.parameters(), lr=1e-3)
+opt = torch.optim.SGD(model.parameters(), lr=3e-4)
 
 # Number of episodes per update
 batch_size = 8192
-ent_coef = 0.0002
-decay_factor = 0.995
+ent_coef = 1.0
+decay_factor = 1.0
 
-agent = REINFORCEAgent(model, opt, batch_size, ent_coef, decay_factor)
+agent = REINFORCEAgent(model, opt, batch_size, ent_coef, decay_factor, normalize_return=True)
 oracle_rewards, agent_rewards, info = evaluate(
     env, agent, num_trials, seed, reduction=None
 )
