@@ -78,8 +78,9 @@ class REINFORCEAgent(Agent):
         self._curr_traj = []
 
     def act(self, state: Any) -> str:
-        p = self._model(torch.tensor(state).float())
-        act = torch.distributions.Bernoulli(logits=p).sample()
+        with torch.no_grad():
+            p = self._model(torch.tensor(state).float())
+            act = torch.distributions.Bernoulli(logits=p).sample()
         if act:
             return ACCEPT
         return REJECT
