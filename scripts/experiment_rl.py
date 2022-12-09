@@ -11,7 +11,7 @@ import torch
 seed = 42
 torch.random
 trials_for_lambda = 500000
-num_trials = 100000
+num_trials = 250000
 num_dists = 100
 
 # Settings for valid truncated normals
@@ -37,10 +37,10 @@ env = RLTruncatedGaussianReward(
 )
 
 # Linear model
-model = torch.nn.Linear(6, 1)
+# model = torch.nn.Linear(6, 1)
 
 # Non-linear model
-# model = torch.nn.Sequential([torch.nn.Linear(6, 32), torch.nn.ReLU(), torch.nn.Linear(32, 1)])
+model = torch.nn.Sequential(torch.nn.Linear(6, 32), torch.nn.ReLU(), torch.nn.Linear(32, 1))
 
 # Basic SGD
 opt = torch.optim.SGD(model.parameters(), lr=1e-3)
