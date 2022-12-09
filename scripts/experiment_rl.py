@@ -53,7 +53,9 @@ batch_size = 8192
 ent_coef = 1.0
 decay_factor = 1.0
 
-agent = REINFORCEAgent(model, opt, batch_size, ent_coef, decay_factor, normalize_return=True)
+agent = REINFORCEAgent(
+    model, opt, batch_size, ent_coef, decay_factor, normalize_return=True
+)
 oracle_rewards, agent_rewards, info = evaluate(
     env, agent, num_trials, seed, reduction=None
 )
