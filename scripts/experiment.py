@@ -36,7 +36,7 @@ print(
 )
 
 threshold = env.get_top_medians()
-print("Obtained eta: {}".format(threshold))
+print("Obtained eta: {}".format(threshold[0]))
 
 agent = ThresholdAgent(threshold=threshold)
 oracle_rewards, agent_rewards = evaluate(env, agent, num_trials, seed)
