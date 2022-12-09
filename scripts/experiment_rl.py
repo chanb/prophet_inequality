@@ -34,7 +34,7 @@ env = RLTruncatedGaussianReward(
     bounds=bounds,
     num_accepts=1,
     history=3,
-    subtract_max=True,
+    subtract_max=False,
     normalize=True,
 )
 
@@ -51,8 +51,8 @@ opt = torch.optim.SGD(model.parameters(), lr=1e-3)
 
 # Number of episodes per update
 batch_size = 8192
-ent_coef = np.max(np.abs(locs)) * 10
-decay_factor = 0.999
+ent_coef = 0.0002
+decay_factor = 0.995
 
 agent = REINFORCEAgent(model, opt, batch_size, ent_coef, decay_factor)
 oracle_rewards, agent_rewards, info = evaluate(

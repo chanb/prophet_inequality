@@ -15,17 +15,32 @@ pip install -e .
 ### Experiments
 The experiments reside in the `scripts` directory. You may simply run the files for corresponding experiments:
 ```
-# For first part
+# For part (i)
 python experiment_single_item.py
 
-# For second/third part
+# Sample outputs ----------------------------------------------------------------------
+# Obtained lambda: 137.6581701249638
+# The empirical expected ratio between ALG and max_i X_i for lambda is 0.7066308110047568
+# Obtained eta: 227.48298772869038
+# The empirical expected ratio between ALG and max_i X_i for eta is 0.8967378890541423
+# The empirical expected ratio between ALG and max_i X_i for random agent is 0.451373960521208
+
+# For parts (ii) & (iii)
 python experiment_multi_item.py
 
-# For RL experiment, this will generate a return plot between OPT (i.e. true max of that particular episode), best loc (i.e. best fixed policy), and REINFORCE learner. The regret can be computed by taking the difference as well.
+# Sample outputs ----------------------------------------------------------------------
+# Obtained lambda: 264.66004646463745
+# The empirical expected ratio between ALG and max_i X_i for lambda is 0.46685194557759335
+# Obtained eta: 227.48298772869038
+# The empirical expected ratio between ALG and max_i X_i for eta is 0.474515789155883
+# The empirical expected ratio between ALG and max_i X_i for random agent is 0.459901796633847
+
+# For part (iv)
+# This will generate a return plot between OPT (i.e. true max of that particular episode), best loc (i.e. best fixed policy), and REINFORCE learner. The regret can be computed by taking the difference between best loc and REINFORCE learner.
+# Further note that tuning this is fairly difficult because it is easy for the agent to prematurely commit to a single action
 python experiment_rl.py
 ```
-Note that for `experiment_multi_item.py`, we will need to change `num_accepts` to modify `k`.  
-Note: Not sure what is going on with the memory leak in PyTorch with M1... Does it have to do with my REINFORCE implementation...? Not sure. Nevertheless, even with the exact same seeding and hyperparameters, the run may or may not complete on the M1 Mac. If I find a different machine then I will test again...
+Note that for `experiment_multi_item.py`, we will need to change `num_accepts` to modify `k`.
 
 ### Code Structure
 ```

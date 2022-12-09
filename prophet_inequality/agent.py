@@ -115,6 +115,7 @@ class REINFORCEAgent(Agent):
             states = torch.tensor(states).float()
             actions = torch.tensor(actions).float()
             returns = torch.tensor(returns).float()
+            returns = (returns - torch.mean(returns)) / (torch.std(returns) + 1e-5)
 
             logits = self._model(states)
             dists = torch.distributions.Bernoulli(logits=logits)
