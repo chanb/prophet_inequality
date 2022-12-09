@@ -21,6 +21,7 @@ def evaluate(
     agent_rewards = []
     oracle_rewards = []
     info = {MAX_LOC: []}
+    best_locs = env.get_best_loc_indices()
     for _ in tqdm(range(num_trials)):
         state = env.reset(rng.randint(low=0, high=MAX_INT))
         if not skip_agent:
@@ -36,9 +37,7 @@ def evaluate(
                 agent.update()
             agent_rewards.append(curr_trial_reward)
         oracle_rewards.append(np.sum(env.get_max_rewards()))
-        info[MAX_LOC].append(
-            np.sum(env.get_sampled_reward()[env.get_max_dists_indices()])
-        )
+        info[MAX_LOC].append(np.sum(env.get_sampled_reward()[best_locs]))
 
     if reduction == "mean":
         return np.mean(oracle_rewards), np.mean(agent_rewards)

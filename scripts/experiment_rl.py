@@ -11,7 +11,7 @@ import torch
 seed = 42
 torch.random
 trials_for_lambda = 500000
-num_trials = 250000
+num_trials = 100000
 num_dists = 100
 
 # Settings for valid truncated normals
@@ -52,7 +52,7 @@ agent = REINFORCEAgent(model, opt, batch_size)
 oracle_rewards, agent_rewards, info = evaluate(
     env, agent, num_trials, seed, reduction=None
 )
-best_locs_rewards = info[MAX_LOC]
+best_locs_rewards = np.asarray(info[MAX_LOC])
 
 # Oracle is OPT (pick in hindsight)
 oracle_rewards = np.mean(
