@@ -80,3 +80,12 @@ class TruncatedGaussianReward(Environment):
 
     def get_max_rewards(self) -> np.ndarray:
         return np.sort(self._sampled_reward)[-self._num_accepts :]
+
+    def get_top_medians(self) -> np.ndarray:
+        medians = truncnorm.median(
+            (self._bounds[:, 0] - self._locs) / self._scales,
+            (self._bounds[:, 1] - self._locs) / self._scales,
+            loc=self._locs,
+            scale=self._scales,
+        )
+        return np.sort(medians)[-self._num_accepts :]

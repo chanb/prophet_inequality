@@ -30,5 +30,19 @@ agent = ThresholdAgent(threshold=threshold)
 oracle_rewards, agent_rewards = evaluate(env, agent, num_trials, seed)
 reward_ratio = agent_rewards / oracle_rewards
 print(
-    "The empirical expected ratio between ALG and max_i X_i is {}".format(reward_ratio)
+    "The empirical expected ratio between ALG and max_i X_i for lambda is {}".format(
+        reward_ratio
+    )
+)
+
+threshold = env.get_top_medians()
+print("Obtained eta: {}".format(threshold))
+
+agent = ThresholdAgent(threshold=threshold)
+oracle_rewards, agent_rewards = evaluate(env, agent, num_trials, seed)
+reward_ratio = agent_rewards / oracle_rewards
+print(
+    "The empirical expected ratio between ALG and max_i X_i for eta is {}".format(
+        reward_ratio
+    )
 )
