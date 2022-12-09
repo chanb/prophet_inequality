@@ -21,7 +21,7 @@ python experiment_single_item.py
 # For second/third part
 python experiment_multi_item.py
 
-# For RL experiment
+# For RL experiment, this will generate a return plot between OPT (i.e. true max of that particular episode), best loc (i.e. best fixed policy), and REINFORCE learner. The regret can be computed by taking the difference as well.
 python experiment_rl.py
 ```
 Note that for `experiment_multi_item.py`, we will need to change `num_accepts` to modify `k`.
@@ -37,7 +37,8 @@ Note that for `experiment_multi_item.py`, we will need to change `num_accepts` t
 │   └── utils.py # helper code
 └── scripts/
     ├── experiment_single_item.py # experiment script for (i)
-    └── experiment_multi_item.py # experiment script for (ii) & (iii)
+    ├── experiment_multi_item.py # experiment script for (ii) & (iii)
+    └── experiment_rl.py # experiment script for (iv)
 ```
 
 #### Agents

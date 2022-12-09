@@ -1,5 +1,5 @@
 from prophet_inequality.agent import Agent
-from prophet_inequality.constants import MAX_INT
+from prophet_inequality.constants import MAX_INT, MAX_LOC
 from prophet_inequality.environment import Environment
 
 from tqdm import tqdm
@@ -20,6 +20,7 @@ def evaluate(
 
     agent_rewards = []
     oracle_rewards = []
+    info = {MAX_LOC: []}
     for _ in tqdm(range(num_trials)):
         state = env.reset(rng.randint(low=0, high=MAX_INT))
         if not skip_agent:
@@ -35,10 +36,13 @@ def evaluate(
                 agent.update()
             agent_rewards.append(curr_trial_reward)
         oracle_rewards.append(np.sum(env.get_max_rewards()))
+        info[MAX_LOC].append(
+            np.sum(env.get_sampled_reward()[env.get_max_dists_indices()])
+        )
 
     if reduction == "mean":
         return np.mean(oracle_rewards), np.mean(agent_rewards)
     elif reduction is None:
-        return np.asarray(oracle_rewards), np.asarray(agent_rewards)
+        return np.asarray(oracle_rewards), np.asarray(agent_rewards), info
     else:
         raise NotImplementedError
