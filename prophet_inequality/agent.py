@@ -12,8 +12,8 @@ class Agent(ABC):
     def act(self, state: Any) -> Any:
         raise NotImplementedError
 
-    def update(self):
-        pass
+    def update(self, pbar: Iterable) -> bool:
+        return False
 
     def store(
         self,
@@ -70,12 +70,17 @@ class REINFORCEAgent(Agent):
         model: torch.nn.Module,
         opt: torch.optim.Optimizer,
         batch_size: int,
+        ent_coef: float = 0.0,
+        decay_factor: float = 0.0,
     ):
         self._model = model
         self._opt = opt
         self._batch_size = batch_size
         self._buffer = []
         self._curr_traj = []
+        self._curr_count = 0
+        self._ent_coef = ent_coef
+        self._decay_factor = decay_factor
 
     def act(self, state: Any) -> str:
         with torch.no_grad():
@@ -93,8 +98,8 @@ class REINFORCEAgent(Agent):
             returns[step] = returns[step + 1] * (1 - dones[step]) + rewards[step]
         return returns[:-1]
 
-    def update(self):
-        if len(self._buffer) == self._batch_size:
+    def update(self, pbar: Iterable) -> bool:
+        if self._curr_count == self._batch_size:
             states = []
             actions = []
             returns = []
@@ -116,9 +121,21 @@ class REINFORCEAgent(Agent):
             log_probs = dists.log_prob(actions)
 
             reinforce_loss = -torch.mean(log_probs * returns)
-            reinforce_loss.backward()
+            entropy_loss = -torch.mean(dists.entropy())  # Maximize entropy
+            pbar.set_postfix(
+                {
+                    "reinforce_loss": reinforce_loss.detach().numpy().item(),
+                    "entropy_loss": entropy_loss.detach().numpy().item(),
+                }
+            )
+            total_loss = reinforce_loss + self._ent_coef * entropy_loss
+            self._ent_coef = self._ent_coef * self._decay_factor
+            total_loss.backward()
             self._opt.step()
             self._buffer = []
+            self._curr_count = 0
+            return True
+        return False
 
     def store(
         self,
@@ -133,6 +150,7 @@ class REINFORCEAgent(Agent):
     ):
         done = truncated or terminated
         self._curr_traj.append((state, 1 if ACCEPT else 0, reward, done))
+        self._curr_count += 1
         if done:
             self._buffer.append(self._curr_traj)
             self._curr_traj = []

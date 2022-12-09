@@ -22,7 +22,8 @@ def evaluate(
     oracle_rewards = []
     info = {MAX_LOC: []}
     best_locs = env.get_best_loc_indices()
-    for _ in tqdm(range(num_trials)):
+    pbar = tqdm(range(num_trials), desc="Interaction")
+    for _ in pbar:
         state = env.reset(rng.randint(low=0, high=MAX_INT))
         if not skip_agent:
             done = False
@@ -34,7 +35,7 @@ def evaluate(
                 curr_trial_reward += reward
                 agent.store(state, action, reward, truncated, terminated, next_state)
                 state = next_state
-                agent.update()
+                updated = agent.update(pbar)
             agent_rewards.append(curr_trial_reward)
         oracle_rewards.append(np.sum(env.get_max_rewards()))
         info[MAX_LOC].append(np.sum(env.get_sampled_reward()[best_locs]))

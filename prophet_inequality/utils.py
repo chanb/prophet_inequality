@@ -1,5 +1,6 @@
 from typing import Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -52,3 +53,31 @@ def generate_truncated_gaussians_bounded_difference(
     bounds = list(zip(lbounds, ubounds))
 
     return locs, scales, bounds
+
+
+def plot_average_returns(
+    oracle_rewards, agent_rewards, best_locs_rewards, average_window=500
+):
+    smoothed_oracle = []
+    smoothed_agent = []
+    smoothed_best_locs = []
+
+    for idx in range(len(oracle_rewards) - average_window + 1):
+        smoothed_oracle.append(np.mean(oracle_rewards[idx : idx + average_window]))
+        smoothed_agent.append(np.mean(agent_rewards[idx : idx + average_window]))
+        smoothed_best_locs.append(
+            np.mean(best_locs_rewards[idx : idx + average_window])
+        )
+
+    plt.title("Return over Updates")
+    plt.plot(np.arange(len(smoothed_oracle)), smoothed_oracle, label="Offline Best")
+    plt.plot(np.arange(len(smoothed_agent)), smoothed_agent, label="Learner")
+    plt.plot(
+        np.arange(len(smoothed_best_locs)),
+        smoothed_best_locs,
+        label="Best Distribution",
+    )
+    plt.xlabel("Timesteps")
+    plt.ylabel("Average Return")
+    plt.legend()
+    plt.show()
