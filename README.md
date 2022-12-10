@@ -42,7 +42,7 @@ python experiment_rl.py
 ```
 Note that for `experiment_multi_item.py`, we will need to change `num_accepts` to modify `k`.
 
-For RL, we only ran a single seed with 10M timesteps on the single-item setting. Preliminary result shows that there remains a suboptimality gap between the best arm vs learner. See image below
+For RL, we only ran a single seed with 10M timesteps on the single-item setting. Preliminary result shows that there remains a suboptimality gap between the best arm vs REINFORCE learner (with a linear policy)---this is even the case when the variance is low and the means between the current and next distributions are bounded by a small number. See image below
 ![REINFORCE](imgs/reinforce.png "REINFORCE")
 
 ### Code Structure
