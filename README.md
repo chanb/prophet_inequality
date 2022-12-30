@@ -1,5 +1,5 @@
 # Prophet Inequality
-This is work done for [CMPUT 676 Assignment 1 Part (b) Winter 2022](https://xiaoqitan.org/teaching/optimization/).
+This is work done for [CMPUT 676 Assignment 1 Part (b) Fall 2022](https://xiaoqitan.org/teaching/optimization/).
 The goal is to use various approaches to solve the standard setting with prophet inequalities.
 
 ## Installation
